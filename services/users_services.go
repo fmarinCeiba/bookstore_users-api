@@ -5,8 +5,8 @@ import (
 	"github.com/fmarinCeiba/bookstore_users-api/utils/errors"
 )
 
-func GetUser(uId int64) (*users.User, *errors.RestErr) {
-	u := users.User{Id: uId}
+func GetUser(uID int64) (*users.User, *errors.RestErr) {
+	u := users.User{Id: uID}
 	if err := u.Get(); err != nil {
 		return nil, err
 	}
@@ -55,4 +55,9 @@ func UpdateUser(isPartial bool, u users.User) (*users.User, *errors.RestErr) {
 		return nil, err
 	}
 	return c, nil
+}
+
+func DeleteUser(uID int64) *errors.RestErr {
+	u := users.User{Id: uID}
+	return u.Delete()
 }
