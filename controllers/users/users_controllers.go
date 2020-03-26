@@ -10,7 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetUser(c *gin.Context) {
+func getUserId(uIdParam string) (int64, *errors.RestErr) {
+	uId, uErr := strconv.ParseInt(uIdParam, 10, 64)
+	if uErr != nil {
+		return 0, errors.NewBadRequestError("invalid user id")
+	}
+	return uId, nil
+}
+
+func Get(c *gin.Context) {
 	uId, uErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if uErr != nil {
 		err := errors.NewBadRequestError("invalid user id")
@@ -26,32 +34,48 @@ func GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-func SearchUser(c *gin.Context) {
+func Search(c *gin.Context) {
 	c.String(http.StatusNotImplemented, "implement me!")
 }
 
-func CreateUser(c *gin.Context) {
+func Create(c *gin.Context) {
 	var user users.User
-	// fmt.Println(user)
-	// bytes, err := ioutil.ReadAll(c.Request.Body)
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// 	return
-	// }
-	// if err := json.Unmarshal(bytes, &user); err != nil {
-	// 	fmt.Println(err.Error())
-	// 	return
-	// }
 	if err := c.ShouldBindJSON(&user); err != nil {
 		restErr := errors.NewBadRequestError(err.Error())
 		c.JSON(restErr.Status, restErr)
 		return
 	}
-	// fmt.Println(user)
 	result, savErr := services.CreateUser(user)
 	if savErr != nil {
 		c.JSON(savErr.Status, savErr)
 		return
 	}
 	c.JSON(http.StatusCreated, result)
+}
+
+func Update(c *gin.Context) {
+	uId, uErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if uErr != nil {
+		err := errors.NewBadRequestError("invalid user id")
+		c.JSON(err.Status, err)
+		return
+	}
+	var user users.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		restErr := errors.NewBadRequestError(err.Error())
+		c.JSON(restErr.Status, restErr)
+		return
+	}
+	isPartial := c.Request.Method == http.MethodPatch
+	user.Id = uId
+	result, updErr := services.UpdateUser(isPartial, user)
+	if updErr != nil {
+		c.JSON(updErr.Status, updErr)
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+func Delete(c *gin.Context) {
+
 }

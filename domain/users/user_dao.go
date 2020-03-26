@@ -8,10 +8,9 @@ import (
 )
 
 const (
-	indexUniqueEmail = "email_UNIQUE"
-	errorNoRows      = "no rows in result set"
-	queryInsertUser  = "INSERT INTO users(first_name, last_name, email, date_created) VALUES (?, ?, ?, ?);"
-	queryGetAnUser   = "SELECT id, first_name, last_name, email, date_created FROM users WHERE id = ?"
+	queryInsertUser = "INSERT INTO users(first_name, last_name, email, date_created) VALUES (?, ?, ?, ?);"
+	queryGetAnUser  = "SELECT id, first_name, last_name, email, date_created FROM users WHERE id = ?"
+	queryUpdateUser = "UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?"
 )
 
 var (
@@ -21,7 +20,7 @@ var (
 func (u *User) Get() *errors.RestErr {
 	stmt, err := users_db.Client.Prepare(queryGetAnUser)
 	if err != nil {
-		return mysql_utils.ParseError(err)
+		return errors.NewInternalServerError(err.Error())
 	}
 	defer stmt.Close()
 	iResult := stmt.QueryRow(u.Id)
@@ -49,5 +48,18 @@ func (u *User) Save() *errors.RestErr {
 	}
 	u.Id = uId
 
+	return nil
+}
+
+func (u *User) Update() *errors.RestErr {
+	stmt, err := users_db.Client.Prepare(queryUpdateUser)
+	if err != nil {
+		return errors.NewInternalServerError(err.Error())
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(u.FirstName, u.LastName, u.Email, u.Id)
+	if err != nil {
+		return mysql_utils.ParseError(err)
+	}
 	return nil
 }
