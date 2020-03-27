@@ -34,7 +34,13 @@ func Get(c *gin.Context) {
 }
 
 func Search(c *gin.Context) {
-	c.String(http.StatusNotImplemented, "implement me!")
+	status := c.Query("status")
+
+	users, err := services.Search(status)
+	if err != nil {
+		c.JSON(err.Status, err)
+	}
+	c.JSON(http.StatusOK, users)
 }
 
 func Create(c *gin.Context) {
