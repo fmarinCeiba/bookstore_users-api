@@ -65,7 +65,7 @@ func (u *User) Update() *errors.RestErr {
 	}
 	defer stmt.Close()
 
-	if _, err = stmt.Exec(u.FirstName, u.LastName, u.Email, u.Id); err != nil {
+	if _, err = stmt.Exec(u.FirstName, u.LastName, u.Email, u.Id, u.Status); err != nil {
 		return mysql_utils.ParseError(err)
 	}
 	return nil
