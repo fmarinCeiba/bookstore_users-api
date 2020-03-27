@@ -10,6 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func TestServiceInterface() {
+
+}
+
 func getUserID(uIDParam string) (int64, *errors.RestErr) {
 	uID, uErr := strconv.ParseInt(uIDParam, 10, 64)
 	if uErr != nil {
@@ -25,7 +29,7 @@ func Get(c *gin.Context) {
 		return
 	}
 
-	result, getErr := services.GetUser(uID)
+	result, getErr := services.UserService.Get(uID)
 	if getErr != nil {
 		c.JSON(getErr.Status, getErr)
 		return
@@ -36,7 +40,7 @@ func Get(c *gin.Context) {
 func Search(c *gin.Context) {
 	status := c.Query("status")
 
-	users, err := services.Search(status)
+	users, err := services.UserService.Search(status)
 	if err != nil {
 		c.JSON(err.Status, err)
 	}
@@ -54,7 +58,7 @@ func Create(c *gin.Context) {
 		c.JSON(restErr.Status, restErr)
 		return
 	}
-	result, savErr := services.CreateUser(user)
+	result, savErr := services.UserService.Create(user)
 	if savErr != nil {
 		c.JSON(savErr.Status, savErr)
 		return
@@ -76,7 +80,7 @@ func Update(c *gin.Context) {
 	}
 	isPartial := c.Request.Method == http.MethodPatch
 	user.Id = uID
-	result, updErr := services.UpdateUser(isPartial, user)
+	result, updErr := services.UserService.Update(isPartial, user)
 	if updErr != nil {
 		c.JSON(updErr.Status, updErr)
 		return
@@ -90,7 +94,7 @@ func Delete(c *gin.Context) {
 		c.JSON(idErr.Status, idErr)
 		return
 	}
-	if delErr := services.DeleteUser(uID); delErr != nil {
+	if delErr := services.UserService.Delete(uID); delErr != nil {
 		c.JSON(delErr.Status, delErr)
 		return
 	}

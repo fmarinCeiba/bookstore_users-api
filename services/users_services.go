@@ -5,7 +5,22 @@ import (
 	"github.com/fmarinCeiba/bookstore_users-api/utils/errors"
 )
 
-func GetUser(uID int64) (*users.User, *errors.RestErr) {
+var (
+	UserService usersServiceInterface = &usersService{}
+)
+
+type usersService struct {
+}
+
+type usersServiceInterface interface {
+	Get(int64) (*users.User, *errors.RestErr)
+	Search(string) (users.Users, *errors.RestErr)
+	Create(users.User) (*users.User, *errors.RestErr)
+	Update(bool, users.User) (*users.User, *errors.RestErr)
+	Delete(int64) *errors.RestErr
+}
+
+func (s *usersService) Get(uID int64) (*users.User, *errors.RestErr) {
 	u := users.User{Id: uID}
 	if err := u.Get(); err != nil {
 		return nil, err
@@ -14,7 +29,12 @@ func GetUser(uID int64) (*users.User, *errors.RestErr) {
 	return &u, nil
 }
 
-func CreateUser(u users.User) (*users.User, *errors.RestErr) {
+func (s *usersService) Search(status string) (users.Users, *errors.RestErr) {
+	dao := users.User{}
+	return dao.FindByStatus(status)
+}
+
+func (s *usersService) Create(u users.User) (*users.User, *errors.RestErr) {
 	if err := u.Validate(); err != nil {
 		return nil, err
 	}
@@ -26,9 +46,9 @@ func CreateUser(u users.User) (*users.User, *errors.RestErr) {
 	return &u, nil
 }
 
-func UpdateUser(isPartial bool, u users.User) (*users.User, *errors.RestErr) {
-	c, err := GetUser(u.Id)
-	if err != nil {
+func (s *usersService) Update(isPartial bool, u users.User) (*users.User, *errors.RestErr) {
+	c := &users.User{Id: u.Id}
+	if err := c.Get(); err != nil {
 		return nil, err
 	}
 
@@ -57,12 +77,7 @@ func UpdateUser(isPartial bool, u users.User) (*users.User, *errors.RestErr) {
 	return c, nil
 }
 
-func DeleteUser(uID int64) *errors.RestErr {
+func (s *usersService) Delete(uID int64) *errors.RestErr {
 	u := users.User{Id: uID}
 	return u.Delete()
-}
-
-func Search(status string) (users.Users, *errors.RestErr) {
-	dao := users.User{}
-	return dao.FindByStatus(status)
 }
