@@ -100,3 +100,18 @@ func Delete(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, map[string]string{"status": "deleted"})
 }
+
+func LogIn(c *gin.Context) {
+	var req users.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		restErr := errors.NewBadRequestError(err.Error())
+		c.JSON(restErr.Status, restErr)
+		return
+	}
+	user, err := services.UserService.LogIn(req)
+	if err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+	c.JSON(http.StatusOK, user.Marshall(c.GetHeader("X-Public") == "true"))
+}

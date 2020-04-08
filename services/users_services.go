@@ -18,6 +18,7 @@ type usersServiceInterface interface {
 	Create(users.User) (*users.User, *errors.RestErr)
 	Update(bool, users.User) (*users.User, *errors.RestErr)
 	Delete(int64) *errors.RestErr
+	LogIn(users.LoginRequest) (*users.User, *errors.RestErr)
 }
 
 func (s *usersService) Get(uID int64) (*users.User, *errors.RestErr) {
@@ -80,4 +81,16 @@ func (s *usersService) Update(isPartial bool, u users.User) (*users.User, *error
 func (s *usersService) Delete(uID int64) *errors.RestErr {
 	u := users.User{Id: uID}
 	return u.Delete()
+}
+
+func (s *usersService) LogIn(lr users.LoginRequest) (*users.User, *errors.RestErr) {
+	dao := &users.User{
+		Email:    lr.Email,
+		Password: lr.Password,
+	}
+	if err := dao.FindByEmailAndPassword(); err != nil {
+		return nil, err
+	}
+
+	return dao, nil
 }
