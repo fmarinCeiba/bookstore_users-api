@@ -7,7 +7,7 @@ import (
 	"github.com/fmarinCeiba/bookstore_oauth-go/oauth"
 	"github.com/fmarinCeiba/bookstore_users-api/domain/users"
 	"github.com/fmarinCeiba/bookstore_users-api/services"
-	"github.com/fmarinCeiba/bookstore_users-api/utils/errors"
+	"github.com/fmarinCeiba/bookstore_utils-go/rest_errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,10 +15,10 @@ func TestServiceInterface() {
 
 }
 
-func getUserID(uIDParam string) (int64, *errors.RestErr) {
+func getUserID(uIDParam string) (int64, *rest_errors.RestErr) {
 	uID, uErr := strconv.ParseInt(uIDParam, 10, 64)
 	if uErr != nil {
-		return 0, errors.NewBadRequestError("invalid user id")
+		return 0, rest_errors.NewBadRequestError("invalid user id")
 	}
 	return uID, nil
 }
@@ -73,7 +73,7 @@ func Search(c *gin.Context) {
 func Create(c *gin.Context) {
 	var user users.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		restErr := errors.NewBadRequestError(err.Error())
+		restErr := rest_errors.NewBadRequestError(err.Error())
 		c.JSON(restErr.Status, restErr)
 		return
 	}
@@ -93,7 +93,7 @@ func Update(c *gin.Context) {
 	}
 	var user users.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		restErr := errors.NewBadRequestError(err.Error())
+		restErr := rest_errors.NewBadRequestError(err.Error())
 		c.JSON(restErr.Status, restErr)
 		return
 	}
@@ -123,7 +123,7 @@ func Delete(c *gin.Context) {
 func LogIn(c *gin.Context) {
 	var req users.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		restErr := errors.NewBadRequestError(err.Error())
+		restErr := rest_errors.NewBadRequestError(err.Error())
 		c.JSON(restErr.Status, restErr)
 		return
 	}
