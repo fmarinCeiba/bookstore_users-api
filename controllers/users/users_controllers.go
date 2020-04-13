@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/fmarinCeiba/bookstore_oauth-go/oauth"
 	"github.com/fmarinCeiba/bookstore_users-api/domain/users"
 	"github.com/fmarinCeiba/bookstore_users-api/services"
 	"github.com/fmarinCeiba/bookstore_users-api/utils/errors"
@@ -23,6 +24,20 @@ func getUserID(uIDParam string) (int64, *errors.RestErr) {
 }
 
 func Get(c *gin.Context) {
+	if err := oauth.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+
+	// if callerID := oauth.GetCallerID(c.Request); callerID == 0 {
+	// 	err := errors.RestErr{
+	// 		Status:  http.StatusUnauthorized,
+	// 		Message: "resource not available",
+	// 	}
+	// 	c.JSON(err.Status, err)
+	// 	return
+	// }
+
 	uID, idErr := getUserID(c.Param("user_id"))
 	if idErr != nil {
 		c.JSON(idErr.Status, idErr)
@@ -34,7 +49,11 @@ func Get(c *gin.Context) {
 		c.JSON(getErr.Status, getErr)
 		return
 	}
-	c.JSON(http.StatusOK, result.Marshall(c.GetHeader("X-Public") == "true"))
+	if oauth.GetCallerID(c.Request) == result.Id {
+		c.JSON(http.StatusOK, result.Marshall(false))
+		return
+	}
+	c.JSON(http.StatusOK, result.Marshall(oauth.IsPublic(c.Request)))
 }
 
 func Search(c *gin.Context) {
