@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/fmarinCeiba/bookstore_users-api/logger"
+	"github.com/fmarinCeiba/bookstore_utils-go/logger"
 	"github.com/gin-gonic/gin"
 )
 

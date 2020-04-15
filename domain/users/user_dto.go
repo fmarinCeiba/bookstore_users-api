@@ -22,7 +22,7 @@ type User struct {
 
 type Users []User
 
-func (u User) Validate() *rest_errors.RestErr {
+func (u User) Validate() rest_errors.RestErr {
 	u.FirstName = strings.TrimSpace(u.FirstName)
 	u.LastName = strings.TrimSpace(u.LastName)
 	u.Email = strings.TrimSpace(strings.ToLower(u.Email))

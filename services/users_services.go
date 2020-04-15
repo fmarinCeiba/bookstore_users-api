@@ -13,15 +13,15 @@ type usersService struct {
 }
 
 type usersServiceInterface interface {
-	Get(int64) (*users.User, *rest_errors.RestErr)
-	Search(string) (users.Users, *rest_errors.RestErr)
-	Create(users.User) (*users.User, *rest_errors.RestErr)
-	Update(bool, users.User) (*users.User, *rest_errors.RestErr)
-	Delete(int64) *rest_errors.RestErr
-	LogIn(users.LoginRequest) (*users.User, *rest_errors.RestErr)
+	Get(int64) (*users.User, rest_errors.RestErr)
+	Search(string) (users.Users, rest_errors.RestErr)
+	Create(users.User) (*users.User, rest_errors.RestErr)
+	Update(bool, users.User) (*users.User, rest_errors.RestErr)
+	Delete(int64) rest_errors.RestErr
+	LogIn(users.LoginRequest) (*users.User, rest_errors.RestErr)
 }
 
-func (s *usersService) Get(uID int64) (*users.User, *rest_errors.RestErr) {
+func (s *usersService) Get(uID int64) (*users.User, rest_errors.RestErr) {
 	u := users.User{Id: uID}
 	if err := u.Get(); err != nil {
 		return nil, err
@@ -30,12 +30,12 @@ func (s *usersService) Get(uID int64) (*users.User, *rest_errors.RestErr) {
 	return &u, nil
 }
 
-func (s *usersService) Search(status string) (users.Users, *rest_errors.RestErr) {
+func (s *usersService) Search(status string) (users.Users, rest_errors.RestErr) {
 	dao := users.User{}
 	return dao.FindByStatus(status)
 }
 
-func (s *usersService) Create(u users.User) (*users.User, *rest_errors.RestErr) {
+func (s *usersService) Create(u users.User) (*users.User, rest_errors.RestErr) {
 	if err := u.Validate(); err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (s *usersService) Create(u users.User) (*users.User, *rest_errors.RestErr) 
 	return &u, nil
 }
 
-func (s *usersService) Update(isPartial bool, u users.User) (*users.User, *rest_errors.RestErr) {
+func (s *usersService) Update(isPartial bool, u users.User) (*users.User, rest_errors.RestErr) {
 	c := &users.User{Id: u.Id}
 	if err := c.Get(); err != nil {
 		return nil, err
@@ -78,12 +78,12 @@ func (s *usersService) Update(isPartial bool, u users.User) (*users.User, *rest_
 	return c, nil
 }
 
-func (s *usersService) Delete(uID int64) *rest_errors.RestErr {
+func (s *usersService) Delete(uID int64) rest_errors.RestErr {
 	u := users.User{Id: uID}
 	return u.Delete()
 }
 
-func (s *usersService) LogIn(lr users.LoginRequest) (*users.User, *rest_errors.RestErr) {
+func (s *usersService) LogIn(lr users.LoginRequest) (*users.User, rest_errors.RestErr) {
 	dao := &users.User{
 		Email:    lr.Email,
 		Password: lr.Password,
